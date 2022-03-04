@@ -1,9 +1,12 @@
-#define ARDUINOJSON_USE_LONG_LONG 1
+#include <Adafruit_NeoPixel.h>
 #include <Arduino_JSON.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+
+#define PIXELS_NUM 8 // Popular NeoPixel ring size
+#define PIXELS_PIN D2
 
 const char *ssid = "SSID";         // SSID Name
 const char *password = "PASSWORD"; // SSID Password
@@ -16,6 +19,8 @@ const double lon = -110.82813058441761;
 const double refreshDelay = 0.5; // in minutes
 
 const String endpoint = "https://api.openweathermap.org/data/2.5/weather";
+
+Adafruit_NeoPixel pixels(PIXELS_NUM, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
 
 WiFiClientSecure wifiClient;
 WiFiUDP ntpUDP;
@@ -32,31 +37,22 @@ typedef struct weatherData WeatherData;
 
 void setup()
 {
+  // Initialize the serial
   Serial.begin(115200);
   delay(500);
   Serial.println('\n');
 
+  // Initialize the RGB Strip
+  pixels.begin();
+
+  // Initialize the WiFi
   WiFi.begin(ssid, password);
-  Serial.print("Connecting to ");
-  Serial.print(ssid);
-  Serial.println(" ...");
 
-  int i = 0;
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(250);
-    Serial.print('.');
-  }
-
-  Serial.println('\n');
-  Serial.println("Connection Established");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
+  connectToNetwork();
 }
 
 void loop()
 {
-
   unsigned long time = getCurrentEpochTime();
 
   WeatherData weather = getCurrentWeatherData();
@@ -76,9 +72,41 @@ void loop()
   delay(refreshDelay * 60 * 1000);
 }
 
+void connectToNetwork()
+{
+  Serial.print("Connecting to ");
+  Serial.print(ssid);
+  Serial.println(" ...");
+
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    pixels.fill(pixels.Color(0, 255, 0));
+    pixels.show();
+    delay(250);
+    Serial.print('.');
+    pixels.clear();
+    pixels.show();
+  }
+
+  Serial.println('\n');
+  Serial.println("Connection Established");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+}
+
 void setColor(double temp)
 {
-  // TODO: Set Color according to temp
+  int hue = 32768 + (32768 * (temp / 100));
+  if (hue < 32768)
+    hue = 32768;
+  if (hue > 65536)
+    hue = 65536;
+
+  uint32_t rgbcolor = pixels.ColorHSV(hue);
+
+  pixels.fill(rgbcolor);
+  pixels.show();
 }
 
 void setPetals(bool open)
