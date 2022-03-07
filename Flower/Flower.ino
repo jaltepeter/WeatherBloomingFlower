@@ -3,22 +3,31 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <NTPClient.h>
+#include <Servo.h>
 #include <WiFiUdp.h>
 
-#define PIXELS_NUM 8 // Popular NeoPixel ring size
-#define PIXELS_PIN D2
-
+/*
+  ADD YOUR VALUES BELOW
+*/
 const char *ssid = "SSID";         // SSID Name
 const char *password = "PASSWORD"; // SSID Password
 
 const String key = "APIKEY"; // API Key for api.openweathermap.org
 
-const double lat = 44.46049654778244;
-const double lon = -110.82813058441761;
+const double lat = 44.46049654778244;   // your latitude
+const double lon = -110.82813058441761; // your longitude
 
-const double refreshDelay = 0.5; // in minutes
+const double refreshDelay = 0.5; // in minutes (I suggest 5-10 minutes)
+/*
+  ADD YOUR VALUES ABOVE
+*/
 
 const String endpoint = "https://api.openweathermap.org/data/2.5/weather";
+
+#define PIXELS_NUM 8 // Popular NeoPixel ring size
+#define PIXELS_PIN D2
+
+Servo servo;
 
 Adafruit_NeoPixel pixels(PIXELS_NUM, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -44,6 +53,11 @@ void setup()
 
   // Initialize the RGB Strip
   pixels.begin();
+
+  // Connect the Servo
+  servo.attach(D4);
+  // servo.write(0);
+  Serial.println(servo.read());
 
   // Initialize the WiFi
   WiFi.begin(ssid, password);
@@ -111,7 +125,32 @@ void setColor(double temp)
 
 void setPetals(bool open)
 {
-  // TODO: Set petals accordingly
+  if (open)
+  {
+    openPetals();
+  }
+  else
+  {
+    closePetals();
+  }
+}
+
+void closePetals()
+{
+  for (int i = servo.read(); i <= 180; i++)
+  {
+    servo.write(i);
+    delay(20);
+  }
+}
+
+void openPetals()
+{
+  for (int i = servo.read(); i >= 0; i--)
+  {
+    servo.write(i);
+    delay(20);
+  }
 }
 
 bool isSunUp(WeatherData weather, unsigned long epochTime)
