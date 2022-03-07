@@ -9,3 +9,12 @@ Sketch for [this 3D printed flower](https://www.prusaprinters.org/prints/134028-
 3) A wireless network to which you know the SSID and password
 
 See the commented section in the .ino file to add your values
+
+## Dependencies
+Designed for an `ESP8266` board, specifically `NodeMCU 1.0 (ESP-12E Module)`.
+
+Additional libraries needed (All can be installed to the Arduino IDE through the Library Manager):
+- [Adafruit NeoPixel](https://www.arduino.cc/reference/en/libraries/adafruit-neopixel/)
+- [Arduino_JSON](https://www.arduino.cc/reference/en/libraries/arduino_json/)
+- [NTPClient](https://www.arduino.cc/reference/en/libraries/ntpclient/)
+- [Servo](https://www.arduino.cc/reference/en/libraries/servo/)
