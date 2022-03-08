@@ -17,7 +17,7 @@ const String key = "APIKEY"; // API Key for api.openweathermap.org
 const double lat = 44.46049654778244;   // your latitude
 const double lon = -110.82813058441761; // your longitude
 
-const double refreshDelay = 0.5; // in minutes (I suggest 5-10 minutes)
+const double refreshDelay = 5; // in minutes (I suggest 5-10 minutes)
 /*
   ADD YOUR VALUES ABOVE
 */
@@ -136,38 +136,44 @@ void setPetals(bool open)
 
 void closePetals()
 {
-  servo.write(currPos);
-  servo.attach(D4);
-  delay(500);
-
-  for (int i = currPos; i <= 180; i++)
+  if (currPos < 180)
   {
-    servo.write(i);
-    delay(20);
-  }
+    servo.write(currPos);
+    servo.attach(D4);
+    delay(500);
 
-  delay(500);
-  currPos = servo.read();
-  servo.detach();
-  delay(500);
+    for (int i = currPos; i <= 180; i++)
+    {
+      Serial.println(i);
+      servo.write(i);
+      delay(20);
+    }
+
+    delay(250);
+    currPos = servo.read();
+    servo.detach();
+  }
 }
 
 void openPetals()
 {
-  servo.write(currPos);
-  servo.attach(D4);
-  delay(500);
-
-  for (int i = currPos; i >= 0; i--)
+  if (currPos > 0)
   {
-    servo.write(i);
-    delay(20);
-  }
+    servo.write(currPos);
+    servo.attach(D4);
+    delay(500);
 
-  delay(500);
-  currPos = servo.read();
-  servo.detach();
-  delay(500);
+    for (int i = currPos; i >= 0; i--)
+    {
+      Serial.println(i);
+      servo.write(i);
+      delay(20);
+    }
+
+    delay(250);
+    currPos = servo.read();
+    servo.detach();
+  }
 }
 
 bool isSunUp(WeatherData weather, unsigned long epochTime)
