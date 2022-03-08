@@ -80,7 +80,7 @@ void loop()
 
   setColor(weather.temp);
 
-  setPetals(!isSunUp(weather, time));
+  setPetals(isSunUp(weather, time));
 
   delay(refreshDelay * 60 * 1000);
 }
