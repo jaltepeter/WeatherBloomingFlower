@@ -28,6 +28,7 @@ const String endpoint = "https://api.openweathermap.org/data/2.5/weather";
 #define PIXELS_PIN D2
 
 Servo servo;
+int currPos;
 
 Adafruit_NeoPixel pixels(PIXELS_NUM, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -54,10 +55,8 @@ void setup()
   // Initialize the RGB Strip
   pixels.begin();
 
-  // Connect the Servo
   servo.attach(D4);
-  // servo.write(0);
-  Serial.println(servo.read());
+  currPos = servo.read();
 
   // Initialize the WiFi
   WiFi.begin(ssid, password);
@@ -81,7 +80,7 @@ void loop()
 
   setColor(weather.temp);
 
-  setPetals(isSunUp(weather, time));
+  setPetals(!isSunUp(weather, time));
 
   delay(refreshDelay * 60 * 1000);
 }
@@ -137,20 +136,38 @@ void setPetals(bool open)
 
 void closePetals()
 {
-  for (int i = servo.read(); i <= 180; i++)
+  servo.write(currPos);
+  servo.attach(D4);
+  delay(500);
+
+  for (int i = currPos; i <= 180; i++)
   {
     servo.write(i);
     delay(20);
   }
+
+  delay(500);
+  currPos = servo.read();
+  servo.detach();
+  delay(500);
 }
 
 void openPetals()
 {
-  for (int i = servo.read(); i >= 0; i--)
+  servo.write(currPos);
+  servo.attach(D4);
+  delay(500);
+
+  for (int i = currPos; i >= 0; i--)
   {
     servo.write(i);
     delay(20);
   }
+
+  delay(500);
+  currPos = servo.read();
+  servo.detach();
+  delay(500);
 }
 
 bool isSunUp(WeatherData weather, unsigned long epochTime)
